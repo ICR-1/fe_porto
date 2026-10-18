@@ -469,24 +469,6 @@ body .project-slider-container.pc-wrap { position: relative; padding: 0 56px; ma
   transition: transform 0.9s var(--ease-out);
 }
 .pcard:hover .pcard-media img { transform: scale(1.07); }
-.pcard-zoom {
-  position: absolute;
-  right: 12px; bottom: 12px;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  padding: 7px 14px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: #fff;
-  background: var(--accent);
-  border-radius: 999px;
-  box-shadow: 0 10px 24px -8px rgba(99, 102, 241, 0.9);
-  opacity: 0;
-  transform: translateY(10px);
-  transition: opacity 0.35s, transform 0.45s var(--ease-out);
-}
-.pcard:hover .pcard-zoom, .pcard-media:focus-visible .pcard-zoom { opacity: 1; transform: none; }
 .pcard-body { display: flex; flex-direction: column; flex: 1; padding: 1.2rem 1.3rem 1.4rem; }
 .pcard-title { margin: 0; font-size: 1.15rem; font-weight: 700; line-height: 1.3; color: #fff; }
 .pcard-desc {
@@ -574,10 +556,9 @@ body .pc-wrap .pc-dots li.slick-active button { width: 28px; background: var(--a
 @media (max-width: 767px) {
   body .project-slider-container.pc-wrap { padding: 0 6px; }
   .pc-arrow { display: none !important; }
-  .pcard-zoom { opacity: 1; transform: none; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .pcard, .pcard-media img, .pcard-zoom, .pc-arrow, .pc-arrow svg { transition: none; }
+  .pcard, .pcard-media img, .pc-arrow, .pc-arrow svg { transition: none; }
 }
 
 /* =========================================================

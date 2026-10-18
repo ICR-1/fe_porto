@@ -3,24 +3,25 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { assetUrl } from '../utils/assets';
 
-const TABLE = { projects: 'projects', certificates: 'certificates', skills: 'skills', profile: 'profiles', musics: 'musics', messages: 'contacts' };
+const TABLE = { projects: 'projects', certificates: 'certificates', skills: 'skills', profile: 'profiles', musics: 'musics', messages: 'contacts', cvs: 'cvs' };
 const BUCKET = { projects: 'projek', certificates: 'sertif', skills: 'skills', profile: 'profile', musics: 'music' };
 // Kolom yang boleh dikirim ke tabel (menggantikan whitelist di handler Go)
 const COLUMNS = {
   projects: ['title', 'description', 'tags', 'link'],
   certificates: ['title'],
   skills: ['name'],
-  profile: ['description', 'cv_url1', 'cv_url2'],
+  profile: ['description'],
+  cvs: ['title', 'url'],
   musics: ['title', 'artist'],
 };
 
 const swalBase = { background: '#151030', color: '#fff' };
 
-const REORDERABLE = ['projects', 'certificates', 'skills'];
+const REORDERABLE = ['projects', 'certificates', 'skills', 'cvs'];
 const MAX_IMAGE_MB = 5;
 const MAX_AUDIO_MB = 20;
-const LABEL = { projects: 'Projects', certificates: 'Certificates', skills: 'Tech Stack', profile: 'About Me', musics: 'Music', messages: 'Pesan' };
-const TABS = ['projects', 'certificates', 'skills', 'profile', 'musics', 'messages'];
+const LABEL = { projects: 'Projects', certificates: 'Certificates', skills: 'Tech Stack', profile: 'About Me', musics: 'Music', messages: 'Pesan', cvs: 'CV' };
+const TABS = ['projects', 'certificates', 'skills', 'profile', 'cvs', 'musics', 'messages'];
 const ICON = {
   projects: 'M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7z',
   certificates: 'M12 15a6 6 0 100-12 6 6 0 000 12zm-3 .5L7.5 21l4.5-2.5 4.5 2.5L15 15.5',
@@ -28,6 +29,7 @@ const ICON = {
   profile: 'M12 12a4 4 0 100-8 4 4 0 000 8zm-7 9a7 7 0 0114 0',
   musics: 'M9 18V6l10-2v12M9 18a3 3 0 11-6 0 3 3 0 016 0zm10-2a3 3 0 11-6 0 3 3 0 016 0z',
   messages: 'M4 6h16v12H4zM4 7l8 6 8-6',
+  cvs: 'M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8l-5-5zM14 3v5h5M9 13h6M9 17h6',
 };
 
 const Icon = ({ d, size = 18 }) => (
@@ -132,6 +134,8 @@ const uploadFile = async (file, bucket) => {
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState('projects');
   const [data, setData] = useState([]);
+  const [dataTab, setDataTab] = useState(null); // tab pemilik `data` (cegah render data tab lama)
+  const tabRef = useRef('projects');
   const [counts, setCounts] = useState({});
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -165,6 +169,7 @@ const Dashboard = () => {
   }, [navigate]);
 
   useEffect(() => {
+    tabRef.current = activeTab;
     if (!authReady) return;
     fetchData();
     setQuery('');
@@ -190,6 +195,7 @@ const Dashboard = () => {
   }, [isModalOpen, saving]);
 
   const fetchData = async () => {
+    const tab = activeTab;
     setLoading(true);
     try {
       let q = supabase.from(TABLE[activeTab]).select('*');
@@ -198,11 +204,14 @@ const Dashboard = () => {
       else if (activeTab !== 'profile') q = q.order('created_at');
       const { data: rows, error } = await q;
       if (error) throw error;
+      if (tabRef.current !== tab) return; // respons tab lama, abaikan
       setData(rows || []);
+      setDataTab(tab);
       setCounts((c) => ({ ...c, [activeTab]: (rows || []).length }));
     } catch (err) {
       console.error('Fetch error:', err);
       toast('error', 'Gagal memuat data');
+      if (tabRef.current === tab) { setData([]); setDataTab(tab); }
     } finally {
       setLoading(false);
     }
@@ -306,6 +315,11 @@ const Dashboard = () => {
     try {
       const payload = {};
       COLUMNS[activeTab].forEach((k) => { if (formData[k] !== undefined) payload[k] = formData[k]; });
+      if (activeTab === 'cvs') {
+        payload.title = (payload.title ?? '').trim();
+        payload.url = (payload.url ?? '').trim();
+        if (!/^https?:\/\/\S+$/i.test(payload.url)) throw new Error('Link CV harus diawali http:// atau https://');
+      }
       if (activeTab === 'projects' && payload.link !== undefined) {
         payload.link = (payload.link ?? '').trim() || null; // opsional: kosong = tanpa link
       }
@@ -383,13 +397,24 @@ const Dashboard = () => {
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return data;
-    return data.filter((d) => [d.title, d.name, d.tags, d.artist, d.description, d.email, d.message].some((v) => v && String(v).toLowerCase().includes(q)));
+    return data.filter((d) => [d.title, d.name, d.tags, d.artist, d.description, d.email, d.message, d.url].some((v) => v && String(v).toLowerCase().includes(q)));
   }, [data, query]);
 
   const canAdd = activeTab !== 'messages' && (activeTab !== 'profile' || data.length === 0);
   const canDrag = reorderable && !query.trim() && filtered.length > 1;
 
   if (!authReady) return null;
+
+  const dragProps = (item) => ({
+    draggable: canDrag,
+    onDragStart: (e) => { setDragId(item.id); e.dataTransfer.effectAllowed = 'move'; },
+    onDragOver: (e) => { if (canDrag && dragId) { e.preventDefault(); if (overId !== item.id) setOverId(item.id); } },
+    onDrop: (e) => { e.preventDefault(); if (canDrag && dragId) handleReorderDrop(item.id); },
+    onDragEnd: () => { setDragId(null); setOverId(null); },
+  });
+  const cardCls = (item) => `bg-tertiary rounded-2xl border transition-all ${
+    dragId === item.id ? 'opacity-40 scale-95 border-blue-500/50' : overId === item.id && dragId ? 'border-blue-500 ring-2 ring-blue-500/40' : 'border-white/5 hover:border-blue-500/30'
+  } ${canDrag ? 'cursor-grab active:cursor-grabbing' : ''}`;
 
   const pageTitle = activeTab === 'messages' ? 'Pesan Masuk' : `Manage ${LABEL[activeTab]}`;
   const imageOf = (item) => (activeTab === 'musics' ? item.cover_path : item.image_path);
@@ -463,7 +488,7 @@ const Dashboard = () => {
           </div>
         )}
 
-        {loading ? (
+        {loading || dataTab !== activeTab ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[0, 1, 2].map((i) => <div key={i} className="bg-tertiary rounded-2xl h-64 animate-pulse border border-white/5" />)}
           </div>
@@ -495,18 +520,20 @@ const Dashboard = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filtered.map((item) => (
-              <div
-                key={item.id}
-                draggable={canDrag}
-                onDragStart={(e) => { setDragId(item.id); e.dataTransfer.effectAllowed = 'move'; }}
-                onDragOver={(e) => { if (canDrag && dragId) { e.preventDefault(); if (overId !== item.id) setOverId(item.id); } }}
-                onDrop={(e) => { e.preventDefault(); if (canDrag && dragId) handleReorderDrop(item.id); }}
-                onDragEnd={() => { setDragId(null); setOverId(null); }}
-                className={`bg-tertiary rounded-2xl overflow-hidden border transition-all group ${
-                  dragId === item.id ? 'opacity-40 scale-95 border-blue-500/50' : overId === item.id && dragId ? 'border-blue-500 ring-2 ring-blue-500/40' : 'border-white/5 hover:border-blue-500/30'
-                } ${canDrag ? 'cursor-grab active:cursor-grabbing' : ''}`}
-              >
+            {filtered.map((item) => activeTab === 'cvs' ? (
+              <div key={item.id} {...dragProps(item)} className={`${cardCls(item)} p-5 flex items-center gap-4`}>
+                <div className="w-12 h-12 shrink-0 rounded-xl bg-blue-600/15 text-blue-400 flex items-center justify-center"><Icon d={ICON.cvs} size={22} /></div>
+                <div className="min-w-0 flex-1">
+                  <h3 className="font-bold truncate">{item.title}</h3>
+                  <a href={item.url} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-400 hover:underline block truncate">{(item.url || '').replace(/^https?:\/\//, '')} ↗</a>
+                </div>
+                <div className="flex gap-2 shrink-0">
+                  <button onClick={() => openEdit(item)} className="p-2 bg-blue-600 hover:bg-blue-500 rounded-lg" title="Edit"><Icon d="M4 20h4L19 9l-4-4L4 16v4zM13.5 6.5l4 4" size={16} /></button>
+                  <button onClick={() => handleDelete(item.id)} className="p-2 bg-red-600 hover:bg-red-500 rounded-lg" title="Hapus"><Icon d="M5 7h14M10 11v6m4-6v6M6 7l1 12a2 2 0 002 2h6a2 2 0 002-2l1-12M9 7V4h6v3" size={16} /></button>
+                </div>
+              </div>
+            ) : (
+              <div key={item.id} {...dragProps(item)} className={`${cardCls(item)} overflow-hidden group`}>
                 <div className="h-40 bg-black-200 relative overflow-hidden">
                   {imageOf(item) ? (
                     <img src={assetUrl(imageOf(item))} alt={item.name || item.title || 'Profile'} draggable={false} className="w-full h-full object-cover transition-transform group-hover:scale-110" />
@@ -570,11 +597,15 @@ const Dashboard = () => {
                   <Field label="Description">
                     <textarea className={`${inputCls} min-h-[120px]`} value={formData.description || ''} onChange={e => setFormData({...formData, description: e.target.value})} required />
                   </Field>
-                  <Field label="CV Link 1">
-                    <input type="text" className={inputCls} value={formData.cv_url1 || ''} onChange={e => setFormData({...formData, cv_url1: e.target.value})} />
+                </>
+              ) : activeTab === 'cvs' ? (
+                <>
+                  <Field label="Nama CV">
+                    <input type="text" maxLength={100} className={inputCls} value={formData.title || ''} onChange={e => setFormData({...formData, title: e.target.value})} placeholder="mis. CV Bahasa Indonesia" required />
                   </Field>
-                  <Field label="CV Link 2">
-                    <input type="text" className={inputCls} value={formData.cv_url2 || ''} onChange={e => setFormData({...formData, cv_url2: e.target.value})} />
+                  <Field label="Link CV">
+                    <input type="url" pattern="https?://.+" maxLength={500} className={inputCls} value={formData.url || ''} onChange={e => setFormData({...formData, url: e.target.value})} placeholder="https://drive.google.com/file/d/…" required />
+                    <p className="text-xs text-secondary mt-1">Pastikan link bisa dibuka publik (mis. Google Drive: “Siapa saja yang memiliki link”).</p>
                   </Field>
                 </>
               ) : activeTab === 'skills' ? (
@@ -612,13 +643,13 @@ const Dashboard = () => {
                 </>
               )}
 
-              <DropZone
+              {activeTab !== 'cvs' && <DropZone
                 kind="image"
                 label={activeTab === 'musics' ? 'Cover Image' : 'Image'}
                 file={selectedFile}
                 currentUrl={editItem ? imageOf(editItem) : null}
                 onFile={setSelectedFile}
-              />
+              />}
 
               <div className="flex gap-4 pt-4">
                 <button type="button" onClick={closeModal} disabled={saving} className="flex-1 bg-white/5 hover:bg-white/10 py-3 rounded-xl disabled:opacity-50">Cancel</button>

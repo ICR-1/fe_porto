@@ -7,7 +7,8 @@ export default defineConfig({
     react(),
     Sitemap({
       hostname: 'https://aufer.my.id',
-      dynamicRoutes: ['/gamer-site', '/privacy', '/terms'],
+      generateRobotsTxt: false, // pakai public/robots.txt buatan sendiri (plugin menimpanya)
+      dynamicRoutes: ['/gamer-site'],
       exclude: ['/login', '/login/admin', '/dashboard'],
     }),
   ],

@@ -1,17 +1,17 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
-import Portfolio from './Portfolio';
-import Login from './pages/Login';
-import Dashboard from './pages/Dashboard';
-import GamerSite from './pages/GamerSite';
-import Legal from './pages/Legal';
+
+// Halaman non-utama dimuat saat dibutuhkan (code-splitting)
+const Login = lazy(() => import('./pages/Login'));
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const GamerSite = lazy(() => import('./pages/GamerSite'));
 
 const RouteHandler = () => {
   const location = useLocation();
   
   useEffect(() => {
     const path = location.pathname;
-    const isSubPage = path.startsWith('/login') || path.startsWith('/dashboard') || path.startsWith('/gamer-site') || path === '/privacy' || path === '/terms';
+    const isSubPage = path.startsWith('/login') || path.startsWith('/dashboard') || path.startsWith('/gamer-site');
     
     // Selectors for non-React elements from index.html (only target elements OUTSIDE #root)
     const selectors = [
@@ -66,15 +66,16 @@ const App = () => {
   return (
     <Router>
       <RouteHandler />
+      <Suspense fallback={null}>
       <Routes>
-        <Route path="/" element={<Portfolio />} />
+        <Route path="/" element={null} />
         <Route path="/login" element={<Login />} />
         <Route path="/login/admin" element={<Navigate to="/login" replace />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/gamer-site" element={<GamerSite />} />
-        <Route path="/privacy" element={<Legal type="privacy" />} />
-        <Route path="/terms" element={<Legal type="terms" />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+      </Suspense>
     </Router>
   );
 };

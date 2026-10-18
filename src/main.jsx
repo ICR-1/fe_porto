@@ -4,8 +4,6 @@ import { initEffects } from './effects';
 import { initSolarSystem } from './solarSystem';
 import { supabase } from './lib/supabase';
 import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import React from 'react';
@@ -14,6 +12,7 @@ import App from './App';
 import SkillsSection from './components/SkillsSection';
 import PortfolioSection from './components/PortfolioSection';
 import AboutSection from './components/AboutSection';
+import { createRandom } from './utils/seededRandom';
 import { expect as expectReady, whenDataReady } from './utils/readiness';
 
 // Register ScrollTrigger plugin
@@ -28,6 +27,7 @@ window.addEventListener('pageshow', (e) => { if (e.persisted) window.scrollTo(0,
 
 // Initialize Three.js scene for background
 const initBackgroundScene = () => {
+  const rand = createRandom(20240601); // benih tetap → latar selalu sama
   const canvas = document.querySelector('#canvas-container');
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -56,11 +56,11 @@ const initBackgroundScene = () => {
   ];
 
   for (let i = 0; i < particlesCount; i++) {
-    posArray[i * 3] = (Math.random() - 0.5) * 10;
-    posArray[i * 3 + 1] = (Math.random() - 0.5) * 10;
-    posArray[i * 3 + 2] = (Math.random() - 0.5) * 10;
+    posArray[i * 3] = (rand() - 0.5) * 10;
+    posArray[i * 3 + 1] = (rand() - 0.5) * 10;
+    posArray[i * 3 + 2] = (rand() - 0.5) * 10;
 
-    const color = colorPalette[Math.floor(Math.random() * colorPalette.length)];
+    const color = colorPalette[Math.floor(rand() * colorPalette.length)];
     colorsArray[i * 3] = color.r;
     colorsArray[i * 3 + 1] = color.g;
     colorsArray[i * 3 + 2] = color.b;
@@ -92,10 +92,10 @@ const initBackgroundScene = () => {
       new THREE.TorusGeometry(0.3, 0.1, 16, 32)
     ];
 
-    const geometry = geometries[Math.floor(Math.random() * geometries.length)];
+    const geometry = geometries[Math.floor(rand() * geometries.length)];
     const material = new THREE.MeshStandardMaterial({
-      color: colorPalette[Math.floor(Math.random() * colorPalette.length)].getHex(),
-      wireframe: Math.random() > 0.5,
+      color: colorPalette[Math.floor(rand() * colorPalette.length)].getHex(),
+      wireframe: rand() > 0.5,
       transparent: true,
       opacity: 0.7,
       metalness: 0.3,
@@ -103,19 +103,19 @@ const initBackgroundScene = () => {
     });
 
     const mesh = new THREE.Mesh(geometry, material);
-    mesh.position.set((Math.random() - 0.5) * 8, (Math.random() - 0.5) * 8, (Math.random() - 0.5) * 8);
-    mesh.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI);
+    mesh.position.set((rand() - 0.5) * 8, (rand() - 0.5) * 8, (rand() - 0.5) * 8);
+    mesh.rotation.set(rand() * Math.PI, rand() * Math.PI, rand() * Math.PI);
 
     mesh.userData = {
       rotationSpeed: {
-        x: (Math.random() - 0.5) * 0.01,
-        y: (Math.random() - 0.5) * 0.01,
-        z: (Math.random() - 0.5) * 0.01
+        x: (rand() - 0.5) * 0.01,
+        y: (rand() - 0.5) * 0.01,
+        z: (rand() - 0.5) * 0.01
       },
-      floatSpeed: 0.005 + Math.random() * 0.005,
-      floatDistance: 0.2 + Math.random() * 0.3,
+      floatSpeed: 0.005 + rand() * 0.005,
+      floatDistance: 0.2 + rand() * 0.3,
       initialY: mesh.position.y,
-      floatOffset: Math.random() * Math.PI * 2
+      floatOffset: rand() * Math.PI * 2
     };
 
     shapes.push(mesh);
@@ -452,38 +452,6 @@ const initSmoothScroll = () => {
   window.addEventListener('scroll', updateNavIndicator);
 };
 
-// Make a dynamic cursor for desktop users
-const initCustomCursor = () => {
-  // Skip cursor creation for mobile devices
-  if (window.innerWidth <= 768 || 'ontouchstart' in window || navigator.maxTouchPoints > 0) return;
-
-  const cursor = document.createElement('div');
-  cursor.classList.add('custom-cursor');
-  document.body.appendChild(cursor);
-
-  // Ganti dengan direct positioning tanpa gsap animation untuk mengurangi delay
-  const moveCursor = (e) => {
-    // Gunakan direct style manipulation daripada gsap animation
-    cursor.style.left = `${e.clientX}px`;
-    cursor.style.top = `${e.clientY}px`;
-  };
-
-  window.addEventListener('mousemove', moveCursor);
-
-  // Change cursor style on hover over interactive elements
-  const interactiveElements = document.querySelectorAll('button, .skill-card, #model-container, a, input, textarea, .social-link, .portfolio-item, .view-button');
-
-  interactiveElements.forEach(el => {
-    el.addEventListener('mouseenter', () => {
-      cursor.classList.add('cursor-hover');
-    });
-
-    el.addEventListener('mouseleave', () => {
-      cursor.classList.remove('cursor-hover');
-    });
-  });
-};
-
 // Initialize preloader
 // ============ INTRO: preloader + animasi hero ============
 const splitHeroTitle = () => {
@@ -682,733 +650,6 @@ const initPreloader = () => {
   });
 };
 
-// Helper function untuk mendapatkan index item yang terlihat
-const findVisibleItemIndex = (carousel, items) => {
-  try {
-    const carouselRect = carousel.getBoundingClientRect();
-    const carouselCenter = carouselRect.left + carouselRect.width / 2;
-
-    let closestItem = 0;
-    let closestDistance = Number.MAX_VALUE;
-
-    items.forEach((item, index) => {
-      const itemRect = item.getBoundingClientRect();
-      const itemCenter = itemRect.left + itemRect.width / 2;
-      const distance = Math.abs(carouselCenter - itemCenter);
-
-      if (distance < closestDistance) {
-        closestDistance = distance;
-        closestItem = index;
-      }
-    });
-
-    return closestItem;
-  } catch (error) {
-    console.error('Error finding visible item index:', error);
-    return 0;
-  }
-};
-
-// Initialize carousel for portfolio
-const initPortfolioCarousel = () => {
-  const carousel = document.getElementById('portfolio-carousel');
-  if (!carousel) {
-    console.error('Portfolio carousel element not found');
-    return;
-  }
-
-  const items = Array.from(carousel.querySelectorAll('.portfolio-item'));
-  console.log(`Found ${items.length} portfolio items for carousel`);
-
-  // Jika tidak ada item, keluar dari fungsi
-  if (items.length === 0) return;
-
-  // Desktop navigation buttons
-  const prevButton = document.getElementById('carousel-prev');
-  const nextButton = document.getElementById('carousel-next');
-
-  // Variable to track touch start position
-  let touchStartX = 0;
-  let touchEndX = 0;
-  let isTouchScrolling = false;
-  let initialScrollPosition = 0;
-
-  // Threshold for swipe detection (in pixels)
-  const SWIPE_THRESHOLD = 50;
-
-  // Track if we are in desktop or mobile
-  const isMobile = window.innerWidth <= 768;
-
-  const scrollToItem = (index) => {
-    try {
-      if (index < 0) index = 0;
-      if (index >= items.length) index = items.length - 1;
-
-      const item = items[index];
-      carousel.scrollTo({
-        left: item.offsetLeft - (carousel.offsetWidth - item.offsetWidth) / 2,
-        behavior: 'smooth'
-      });
-
-      // Update projects counter
-      updateProjectCounter(index, items.length);
-    } catch (error) {
-      console.error('Error scrolling to item:', error);
-    }
-  };
-
-  // Create and update project counter (1/7, 2/7, etc.)
-  const updateProjectCounter = (currentIndex, totalItems) => {
-    let counter = document.getElementById('portfolio-counter');
-
-    if (!counter) {
-      counter = document.createElement('div');
-      counter.id = 'portfolio-counter';
-      counter.className = 'portfolio-counter';
-
-      // Create a container div for better positioning
-      const counterContainer = document.createElement('div');
-      counterContainer.className = 'counter-container';
-      counterContainer.appendChild(counter);
-
-      // Insert before carousel instead of appending as child
-      carousel.parentNode.insertBefore(counterContainer, carousel);
-    }
-
-    counter.textContent = `${currentIndex + 1}/${totalItems}`;
-  };
-
-  // Improved touch event handlers
-  const handleTouchStart = (e) => {
-    try {
-      // Store the initial touch position
-      touchStartX = e.touches[0].clientX;
-      initialScrollPosition = carousel.scrollLeft;
-      isTouchScrolling = false;
-    } catch (error) {
-      console.error('Error in touch start handler:', error);
-    }
-  };
-
-  const handleTouchMove = (e) => {
-    try {
-      // Do not prevent default scrolling if the user is swiping up/down
-      const touchY = e.touches[0].clientY;
-      const startTouchY = e.touches[0].initialTouchY || touchY;
-
-      // Check if scrolling vertically (more vertical than horizontal)
-      const touchCurrentX = e.touches[0].clientX;
-      const deltaX = Math.abs(touchCurrentX - touchStartX);
-      const deltaY = Math.abs(touchY - startTouchY);
-
-      // If scrolling more vertically, don't interfere with page scroll
-      if (deltaY > deltaX) {
-        isTouchScrolling = true;
-        return;
-      }
-
-      // For horizontal swipes in the carousel, prevent page scrolling
-      if (deltaX > 10 && !isTouchScrolling) {
-        // e.preventDefault(); // Commented out to allow natural scrolling
-      }
-    } catch (error) {
-      console.error('Error in touch move handler:', error);
-    }
-  };
-
-  const handleTouchEnd = (e) => {
-    try {
-      // If vertical scrolling detected, don't handle the swipe
-      if (isTouchScrolling) {
-        return;
-      }
-
-      // Calculate the final position
-      touchEndX = e.changedTouches[0].clientX;
-      const diffX = touchStartX - touchEndX;
-
-      // Determine the direction of the swipe
-      if (Math.abs(diffX) > SWIPE_THRESHOLD) {
-        // Find the current visible item index
-        const visibleItemIndex = findVisibleItemIndex(carousel, items);
-
-        if (diffX > 0) {
-          // Swipe left (next)
-          scrollToItem(visibleItemIndex + 1);
-        } else {
-          // Swipe right (previous)
-          scrollToItem(visibleItemIndex - 1);
-        }
-      } else {
-        // If it was a small movement, restore to the initial position
-        carousel.scrollTo({
-          left: initialScrollPosition,
-          behavior: 'smooth'
-        });
-      }
-    } catch (error) {
-      console.error('Error in touch end handler:', error);
-    }
-  };
-
-  // Desktop navigation event listeners
-  if (prevButton) {
-    prevButton.addEventListener('click', () => {
-      try {
-        const visibleIndex = findVisibleItemIndex(carousel, items);
-        scrollToItem(visibleIndex - 1);
-      } catch (error) {
-        console.error('Error in prev button handler:', error);
-      }
-    });
-  }
-
-  if (nextButton) {
-    nextButton.addEventListener('click', () => {
-      try {
-        const visibleIndex = findVisibleItemIndex(carousel, items);
-        scrollToItem(visibleIndex + 1);
-      } catch (error) {
-        console.error('Error in next button handler:', error);
-      }
-    });
-  }
-
-  // Add improved touch event listeners
-  carousel.addEventListener('touchstart', handleTouchStart, { passive: true });
-  carousel.addEventListener('touchmove', handleTouchMove, { passive: true });
-  carousel.addEventListener('touchend', handleTouchEnd, { passive: true });
-
-  // Initialize to the first item
-  setTimeout(() => {
-    scrollToItem(0);
-  }, 100);
-
-  // Update scroll position on resize
-  window.addEventListener('resize', () => {
-    const visibleIndex = findVisibleItemIndex(carousel, items);
-    scrollToItem(visibleIndex);
-  });
-
-  console.log('Portfolio carousel initialized successfully');
-};
-
-// Initialize lightbox gallery
-const initLightboxGallery = () => {
-  const modal = document.getElementById('lightbox-modal');
-  const closeButton = document.getElementById('close-lightbox');
-  const lightboxImage = document.getElementById('lightbox-image');
-  const lightboxTitle = document.getElementById('lightbox-title');
-  const lightboxDescription = document.getElementById('lightbox-description');
-  const zoomInButton = document.getElementById('zoom-in');
-  const zoomOutButton = document.getElementById('zoom-out');
-  const thumbnailsContainer = document.getElementById('thumbnails');
-  const lightboxContent = document.getElementById('lightbox-content');
-
-  if (!modal || !lightboxImage) {
-    console.error('Lightbox elements not found');
-    return null;
-  }
-
-  // Pre-load lightbox modal styling untuk menghindari lag saat pertama kali dibuka
-  modal.style.display = 'none';
-
-  // Certificate Lightbox Handler
-  const certificateButtons = document.querySelectorAll('.certificate-button');
-  certificateButtons.forEach(button => {
-    button.addEventListener('click', (e) => {
-      e.preventDefault();
-      const certificateUrl = button.getAttribute('href');
-      const certificateTitle = button.querySelector('span').textContent;
-
-      // Reset zoom dan position
-      scale = 1;
-      translateX = 0;
-      translateY = 0;
-      updateImageTransform();
-
-      // Update lightbox content
-      lightboxImage.src = certificateUrl;
-      lightboxTitle.textContent = certificateTitle;
-
-      lightboxDescription.innerHTML = 'Klik dua kali untuk memperbesar atau kecilkan. Klik dan tahan untuk menggeser gambar.';
-
-      // Clear thumbnails
-      if (thumbnailsContainer) {
-        thumbnailsContainer.innerHTML = '';
-      }
-
-      // Show modal
-      modal.style.display = 'flex';
-      modal.classList.add('active');
-      document.body.style.overflow = 'hidden';
-    });
-  });
-
-  // Portfolio data untuk lightbox
-  const portfolioItems = Array.from(document.querySelectorAll('.portfolio-item'));
-  let currentIndex = 0;
-  let scale = 1;
-  let isDragging = false;
-  let startX = 0;
-  let startY = 0;
-  let translateX = 0;
-  let translateY = 0;
-
-  // Open lightbox dengan index project
-  const openLightbox = (index) => {
-    console.log('Opening lightbox with index:', index);
-    currentIndex = index;
-
-    if (!portfolioItems[currentIndex]) {
-      console.error('Portfolio item not found for index:', index);
-      return;
-    }
-
-    const item = portfolioItems[currentIndex];
-    const imageUrl = item.getAttribute('data-image') || '';
-
-    console.log('Found portfolio item:', item);
-    console.log('Image URL:', imageUrl);
-
-    // Reset zoom dan position
-    resetZoomAndPosition();
-
-    // Update lightbox content - gunakan URL gambar yang tersimpan dalam atribut data-image
-    if (imageUrl && imageUrl !== '') {
-      lightboxImage.src = imageUrl;
-      lightboxImage.alt = item.getAttribute('data-title') || '';
-      console.log('Setting image src to:', imageUrl);
-    } else {
-      console.error('Image URL not found or empty in portfolio item');
-      // Fallback ke gambar pertama di dalam item jika ada
-      const image = item.querySelector('img');
-      if (image) {
-        lightboxImage.src = image.src;
-        lightboxImage.alt = image.alt;
-        console.log('Fallback setting image src to:', image.src);
-      }
-    }
-
-    // Update title dan description
-    lightboxTitle.textContent = item.getAttribute('data-title') || '';
-    lightboxDescription.innerHTML = item.getAttribute('data-description') || '';
-
-    // Tambahkan instruksi navigasi
-    const navigationInstructions = '<div class="text-xs mt-2 text-gray-400">Klik dua kali untuk memperbesar atau kecilkan. Klik dan tahan untuk menggeser gambar.</div>';
-
-    lightboxDescription.innerHTML += navigationInstructions;
-
-    // Generate thumbnails
-    generateThumbnails();
-
-    // Show modal
-    modal.classList.remove('hidden'); // Hapus hidden class jika ada
-    modal.style.display = 'flex';
-    modal.classList.add('active');
-    console.log('Modal classes after open:', modal.className);
-    document.body.style.overflow = 'hidden';
-  };
-
-  // Close lightbox
-  const closeLightbox = () => {
-    // Animasikan penutupan
-    gsap.to(lightboxImage, {
-      opacity: 0,
-      duration: 0.2,
-      onComplete: () => {
-        modal.classList.remove('active');
-        modal.style.display = 'none';
-        // Restore scroll
-        document.body.style.overflow = '';
-        // Reset lightbox content setelah ditutup
-        setTimeout(() => {
-          lightboxImage.style.opacity = 1;
-        }, 100);
-      }
-    });
-
-    // Kembali ke halaman sebelumnya jika URL mengandung hash
-    if (window.location.hash) {
-      history.back();
-    }
-  };
-
-  // Reset zoom and position
-  const resetZoomAndPosition = () => {
-    scale = 1;
-    translateX = 0;
-    translateY = 0;
-    lightboxImage.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
-    lightboxImage.classList.remove('zoomed');
-    document.getElementById('lightbox-content').style.cursor = 'grab';
-  };
-
-  // Update image transform
-  const updateImageTransform = () => {
-    lightboxImage.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
-  };
-
-  // Zoom in
-  const zoomIn = () => {
-    if (scale < 3) {
-      scale += 0.5;
-      updateImageTransform();
-
-      if (scale > 1) {
-        lightboxImage.classList.add('zoomed');
-        document.getElementById('lightbox-content').style.cursor = 'move';
-      }
-    }
-  };
-
-  // Zoom out
-  const zoomOut = () => {
-    if (scale > 0.5) {
-      scale -= 0.5;
-
-      if (scale === 1) {
-        resetZoomAndPosition();
-      } else {
-        updateImageTransform();
-      }
-    }
-  };
-
-  // Generate thumbnails
-  const generateThumbnails = () => {
-    if (!thumbnailsContainer) return;
-
-    thumbnailsContainer.innerHTML = '';
-
-    portfolioItems.forEach((item, index) => {
-      const thumbnail = document.createElement('div');
-      thumbnail.className = 'thumbnail';
-      if (index === currentIndex) {
-        thumbnail.classList.add('active');
-      }
-
-      const img = document.createElement('img');
-      const itemImg = item.querySelector('img');
-      if (itemImg) {
-        img.src = itemImg.src;
-        img.alt = `Thumbnail ${index + 1}`;
-      }
-
-      thumbnail.appendChild(img);
-      thumbnailsContainer.appendChild(thumbnail);
-
-      thumbnail.addEventListener('click', () => {
-        openLightbox(index);
-      });
-    });
-  };
-
-  // Update active thumbnail
-  const updateActiveThumbnail = () => {
-    if (!thumbnailsContainer) return;
-
-    const thumbnails = thumbnailsContainer.querySelectorAll('.thumbnail');
-
-    thumbnails.forEach((thumb, index) => {
-      if (index === currentIndex) {
-        thumb.classList.add('active');
-      } else {
-        thumb.classList.remove('active');
-      }
-    });
-  };
-
-  // Add event listeners
-  if (closeButton) {
-    closeButton.addEventListener('click', closeLightbox);
-  }
-
-  if (zoomInButton) {
-    zoomInButton.addEventListener('click', zoomIn);
-  }
-
-  if (zoomOutButton) {
-    zoomOutButton.addEventListener('click', zoomOut);
-  }
-
-  // Listen for escape key
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && modal.classList.contains('active')) {
-      closeLightbox();
-    }
-  });
-
-  // Handle mouse/touch events untuk fitur drag gambar (saat zoomed)
-  const handleDragStart = (e) => {
-    if (scale <= 1) return; // Hanya drag saat zoomed in
-
-    // Untuk mouse
-    if (e.type === 'mousedown') {
-      isDragging = true;
-      startX = e.clientX;
-      startY = e.clientY;
-      lightboxContent.style.cursor = 'grabbing';
-    }
-    // Untuk touch
-    else if (e.type === 'touchstart') {
-      isDragging = true;
-      startX = e.touches[0].clientX;
-      startY = e.touches[0].clientY;
-    }
-
-    e.preventDefault();
-    e.stopPropagation();
-  };
-
-  const handleDragMove = (e) => {
-    if (!isDragging) return;
-
-    let clientX, clientY;
-
-    // Untuk mouse
-    if (e.type === 'mousemove') {
-      clientX = e.clientX;
-      clientY = e.clientY;
-    }
-    // Untuk touch
-    else if (e.type === 'touchmove') {
-      clientX = e.touches[0].clientX;
-      clientY = e.touches[0].clientY;
-    } else {
-      return;
-    }
-
-    // Hitung jarak perpindahan
-    const moveX = clientX - startX;
-    const moveY = clientY - startY;
-
-    // Update posisi
-    translateX += moveX;
-    translateY += moveY;
-
-    // Batasi perpindahan berdasarkan ukuran gambar dan zoom level
-    const imageRect = lightboxImage.getBoundingClientRect();
-    const containerRect = lightboxContent.getBoundingClientRect();
-
-    // Batas berdasarkan zoom level
-    const bounds = {
-      left: (imageRect.width * scale - containerRect.width) / 2,
-      right: (imageRect.width * scale - containerRect.width) / 2,
-      top: (imageRect.height * scale - containerRect.height) / 2,
-      bottom: (imageRect.height * scale - containerRect.height) / 2
-    };
-
-    // Batasi perpindahan
-    if (bounds.left > 0) {
-      translateX = Math.max(Math.min(translateX, bounds.left), -bounds.right);
-    } else {
-      translateX = 0;
-    }
-
-    if (bounds.top > 0) {
-      translateY = Math.max(Math.min(translateY, bounds.top), -bounds.bottom);
-    } else {
-      translateY = 0;
-    }
-
-    // Update transform
-    updateImageTransform();
-
-    // Reset start point
-    startX = clientX;
-    startY = clientY;
-
-    e.preventDefault();
-    e.stopPropagation();
-  };
-
-  const handleDragEnd = (e) => {
-    if (!isDragging) return;
-
-    isDragging = false;
-    if (scale > 1) {
-      lightboxContent.style.cursor = 'move';
-    } else {
-      lightboxContent.style.cursor = 'grab';
-    }
-
-    e.preventDefault();
-    e.stopPropagation();
-  };
-
-  // Mouse events
-  lightboxContent.addEventListener('mousedown', handleDragStart);
-  window.addEventListener('mousemove', handleDragMove);
-  window.addEventListener('mouseup', handleDragEnd);
-
-  // Touch events
-  lightboxContent.addEventListener('touchstart', handleDragStart, { passive: false });
-  window.addEventListener('touchmove', handleDragMove, { passive: false });
-  window.addEventListener('touchend', handleDragEnd);
-
-  // Double click untuk cepat zoom in/out
-  lightboxContent.addEventListener('dblclick', (e) => {
-    e.preventDefault();
-
-    if (scale > 1) {
-      // Jika sudah di-zoom, reset ke normal
-      resetZoomAndPosition();
-    } else {
-      // Jika belum di-zoom, zoom ke 2x
-      scale = 2;
-      updateImageTransform();
-      lightboxImage.classList.add('zoomed');
-      lightboxContent.style.cursor = 'move';
-    }
-  });
-
-  // Wheel event untuk zoom
-  lightboxContent.addEventListener('wheel', (e) => {
-    e.preventDefault();
-
-    // Tentukan sensitivitas zoom
-    const zoomSpeed = 0.1;
-
-    // Hitung perubahan zoom berdasarkan wheel delta
-    if (e.deltaY < 0) {
-      // Scroll up - zoom in
-      if (scale < 3) {
-        scale += zoomSpeed;
-        if (scale > 1) {
-          lightboxImage.classList.add('zoomed');
-          lightboxContent.style.cursor = 'move';
-        }
-      }
-    } else {
-      // Scroll down - zoom out
-      if (scale > 0.5) {
-        scale -= zoomSpeed;
-        if (scale <= 1) {
-          resetZoomAndPosition();
-        }
-      }
-    }
-
-    // Update transform
-    updateImageTransform();
-  }, { passive: false });
-
-  return {
-    openLightbox,
-    closeLightbox,
-    resetZoomAndPosition,
-    zoomIn,
-    zoomOut
-  };
-};
-
-// Initialize portfolio view buttons
-const initPortfolioViewButtons = () => {
-  console.log('Initializing portfolio view buttons');
-
-  // Get all view buttons from the portfolio
-  const viewButtons = document.querySelectorAll('.view-button');
-
-  // Initialize lightbox elements
-  const modal = document.getElementById('lightbox-modal');
-  const closeButton = document.getElementById('close-lightbox');
-  const lightboxImage = document.getElementById('lightbox-image');
-  const lightboxTitle = document.getElementById('lightbox-title');
-  const lightboxDescription = document.getElementById('lightbox-description');
-
-  if (!modal || !lightboxImage) {
-    console.error('Lightbox elements not found');
-    return;
-  }
-
-  // Pre-load lightbox modal styling
-  modal.style.display = 'none';
-
-  console.log('View buttons found:', viewButtons.length);
-
-  // Add event listeners to each button
-  viewButtons.forEach((button) => {
-    console.log('Adding click event to button');
-    button.addEventListener('click', function (event) {
-      event.preventDefault();
-      event.stopPropagation();
-
-      try {
-        console.log('Button clicked');
-        // Ambil parent element (portfolio item)
-        const portfolioItem = this.closest('.portfolio-item');
-        if (!portfolioItem) {
-          console.error('Could not find parent portfolio item');
-          return;
-        }
-
-        // Simpan ID proyek yang aktif di modal untuk referensi saat switchLanguage
-        const projectId = portfolioItem.getAttribute('data-id');
-        modal.setAttribute('data-active-project', projectId);
-
-        console.log('Portfolio item found:', portfolioItem.getAttribute('data-id'));
-
-        // Ambil URL gambar
-        let imageUrl = portfolioItem.getAttribute('data-image');
-        if (!imageUrl) {
-          const imgElement = portfolioItem.querySelector('img');
-          if (imgElement) {
-            imageUrl = imgElement.src;
-            portfolioItem.setAttribute('data-image', imageUrl);
-          } else {
-            console.error('No image found in portfolio item');
-            return;
-          }
-        }
-
-        console.log('Opening lightbox with image:', imageUrl);
-
-        // Reset zoom dan position
-        let scale = 1;
-        let translateX = 0;
-        let translateY = 0;
-        lightboxImage.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
-        lightboxImage.classList.remove('zoomed');
-
-        // Update lightbox content
-        lightboxImage.src = imageUrl;
-
-        // Set title and description
-        lightboxTitle.textContent = portfolioItem.getAttribute('data-title') || '';
-        lightboxDescription.innerHTML = portfolioItem.getAttribute('data-description') || '';
-
-        // Tambahkan instruksi navigasi
-        const navigationInstructions = '<div class="text-xs mt-2 text-gray-400">Klik dua kali untuk memperbesar atau kecilkan. Klik dan tahan untuk menggeser gambar.</div>';
-
-        lightboxDescription.innerHTML += navigationInstructions;
-
-        // Show modal
-        modal.classList.remove('hidden');
-        modal.style.display = 'flex';
-        modal.classList.add('active');
-        document.body.style.overflow = 'hidden';
-
-        console.log('Modal opened successfully');
-      } catch (error) {
-        console.error('Error opening lightbox:', error);
-      }
-    });
-  });
-
-  // Initialize close button functionality
-  if (closeButton) {
-    closeButton.addEventListener('click', () => {
-      console.log('Close button clicked');
-      modal.classList.remove('active');
-      setTimeout(() => {
-        modal.style.display = 'none';
-        document.body.style.overflow = '';
-      }, 300);
-    });
-  }
-};
-
 // Initialize text animation for changing subtitle
 const initChangingText = () => {
   const changingTextElement = document.getElementById('changing-text');
@@ -1582,7 +823,46 @@ const initCVModal = () => {
 
   if (!cvModal || !closeModalButton || !cvModalContent) return;
 
+  // Daftar CV diambil dari tabel `cvs` (dikelola di admin), dimuat saat modal pertama dibuka
+  const cvList = document.getElementById('cv-modal-list');
+  const CV_COLORS = ['bg-blue-600 hover:bg-blue-700', 'bg-indigo-600 hover:bg-indigo-700'];
+  const CV_ICON = 'M12 10v6m0 0l-3-3m3 3l3-3M3 17V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z';
+  let cvLoaded = false;
+  const cvMessage = (text) => {
+    const p = document.createElement('p');
+    p.className = 'text-secondary text-sm col-span-full text-center py-4';
+    p.textContent = text;
+    cvList.replaceChildren(p);
+  };
+  const loadCVs = async () => {
+    if (!cvList || cvLoaded) return;
+    try {
+      const { data, error } = await supabase.from('cvs').select('*').order('position', { nullsFirst: false }).order('created_at');
+      if (error) throw error;
+      const rows = (data || []).filter((c) => /^https?:\/\//i.test(c.url));
+      if (!rows.length) { cvMessage('Belum ada CV yang tersedia.'); cvLoaded = true; return; }
+      cvList.replaceChildren(...rows.map((c, i) => {
+        const a = document.createElement('a');
+        a.href = c.url;
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        a.className = `${CV_COLORS[i % CV_COLORS.length]} text-white py-4 px-6 rounded-lg transition-all duration-300 transform hover:scale-105 flex flex-col items-center justify-center text-center`;
+        a.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${CV_ICON}" /></svg>`;
+        const label = document.createElement('span');
+        label.className = 'font-medium';
+        label.textContent = c.title;
+        a.appendChild(label);
+        return a;
+      }));
+      cvLoaded = true;
+    } catch (err) {
+      console.error('CV load error:', err);
+      cvMessage('Gagal memuat CV. Coba lagi nanti.');
+    }
+  };
+
   const openModal = () => {
+    loadCVs();
     // Show modal
     cvModal.classList.remove('hidden');
 
@@ -1638,26 +918,6 @@ const initCVModal = () => {
     if (e.key === 'Escape' && !cvModal.classList.contains('hidden')) {
       closeModal();
     }
-  });
-
-  // Add hover animations for CV buttons
-  const cvButtons = cvModal.querySelectorAll('a');
-  cvButtons.forEach(button => {
-    button.addEventListener('mouseenter', () => {
-      gsap.to(button, {
-        y: -5,
-        boxShadow: '0 10px 15px rgba(0, 0, 0, 0.2)',
-        duration: 0.2
-      });
-    });
-
-    button.addEventListener('mouseleave', () => {
-      gsap.to(button, {
-        y: 0,
-        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-        duration: 0.2
-      });
-    });
   });
 };
 

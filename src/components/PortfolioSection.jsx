@@ -246,12 +246,6 @@ const PortfolioSection = () => {
                         aria-label={`Lihat gambar ${project.title}`}
                       >
                         <img src={assetUrl(project.image_path)} alt={project.title} loading="lazy" draggable="false" />
-                        <span className="pcard-zoom">
-                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                            <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
-                          </svg>
-                          Lihat gambar
-                        </span>
                       </a>
                       <div className="pcard-body">
                         <h3 className="pcard-title">{project.title}</h3>

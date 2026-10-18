@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { createRandom } from './utils/seededRandom';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
@@ -347,6 +348,7 @@ const SUN_INFO = { name: 'Matahari', info: { diameter: '1.392.700 km', jarak: 'â
 const omegaOf = (a) => 0.2 * Math.pow(7 / a, 1.15);
 
 export const initSolarSystem = (container) => {
+  const rand = createRandom(1987); // benih tetap â†’ bintang & sabuk asteroid selalu sama
   if (!container) return;
   const mobile = window.innerWidth <= 768;
   const setHeight = () => { container.style.height = window.innerWidth <= 768 ? '420px' : '640px'; };
@@ -407,13 +409,13 @@ export const initSolarSystem = (container) => {
     const col = new Float32Array(count * 3);
     const tints = [[1, 1, 1], [0.75, 0.85, 1], [1, 0.9, 0.75]];
     for (let i = 0; i < count; i++) {
-      const r = 350 + Math.random() * 450;
-      const th = Math.random() * Math.PI * 2;
-      const ph = Math.acos(2 * Math.random() - 1);
+      const r = 350 + rand() * 450;
+      const th = rand() * Math.PI * 2;
+      const ph = Math.acos(2 * rand() - 1);
       pos[i * 3] = r * Math.sin(ph) * Math.cos(th);
       pos[i * 3 + 1] = r * Math.cos(ph);
       pos[i * 3 + 2] = r * Math.sin(ph) * Math.sin(th);
-      const t = tints[(Math.random() * 3) | 0], b = 0.6 + Math.random() * 0.4;
+      const t = tints[(rand() * 3) | 0], b = 0.6 + rand() * 0.4;
       col[i * 3] = t[0] * b; col[i * 3 + 1] = t[1] * b; col[i * 3 + 2] = t[2] * b;
     }
     const g = new THREE.BufferGeometry();
@@ -425,7 +427,7 @@ export const initSolarSystem = (container) => {
     });
     const p = new THREE.Points(g, m);
     scene.add(p);
-    starLayers.push({ p, base: opacity, phase: Math.random() * 6 });
+    starLayers.push({ p, base: opacity, phase: rand() * 6 });
   };
   makeStars(mobile ? 700 : 1600, 2.2, 0.9);
   makeStars(mobile ? 200 : 500, 3.6, 0.85);
@@ -541,14 +543,22 @@ export const initSolarSystem = (container) => {
   const nextJob = () => {
     if (jobIdx >= jobs.length) return;
     const [key, recipe] = jobs[jobIdx++];
-    const tex = recipes[recipe]();
     const mat = planetMaterials[key];
-    mat.map = tex; mat.color.set(0xffffff); mat.needsUpdate = true;
+    const apply = (tex) => { mat.map = tex; mat.color.set(0xffffff); mat.needsUpdate = true; };
     if (key === 'earth') {
-      const b = bodies.find((x) => x.data.key === 'earth');
-      b.clouds.material.map = recipes.earthClouds();
-      b.clouds.material.needsUpdate = true;
-      mat.roughness = 0.7;
+      // Tekstur Bumi dari geografi dunia nyata (dimuat terpisah karena datanya besar)
+      import('./earthTexture')
+        .then((m) => m.createEarthTexture())
+        .catch((err) => { console.error('Earth texture failed, using fallback:', err); return recipes.earth(); })
+        .then((tex) => {
+          apply(tex);
+          const b = bodies.find((x) => x.data.key === 'earth');
+          b.clouds.material.map = recipes.earthClouds();
+          b.clouds.material.needsUpdate = true;
+          mat.roughness = 0.7;
+        });
+    } else {
+      apply(recipes[recipe]());
     }
     setTimeout(nextJob, 30);
   };
@@ -563,13 +573,13 @@ export const initSolarSystem = (container) => {
   );
   const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler(), s = new THREE.Vector3(), v = new THREE.Vector3();
   for (let i = 0; i < beltCount; i++) {
-    const r = 28.2 + (Math.random() + Math.random() - 1) * 2.2;
-    const th = Math.random() * Math.PI * 2;
-    v.set(Math.cos(th) * r, (Math.random() - 0.5) * 0.9 * (1 + Math.random()), Math.sin(th) * r);
-    e.set(Math.random() * 6, Math.random() * 6, Math.random() * 6);
+    const r = 28.2 + (rand() + rand() - 1) * 2.2;
+    const th = rand() * Math.PI * 2;
+    v.set(Math.cos(th) * r, (rand() - 0.5) * 0.9 * (1 + rand()), Math.sin(th) * r);
+    e.set(rand() * 6, rand() * 6, rand() * 6);
     q.setFromEuler(e);
-    const sc = 0.5 + Math.pow(Math.random(), 3) * 1.8;
-    s.set(sc, sc * (0.7 + Math.random() * 0.5), sc);
+    const sc = 0.5 + Math.pow(rand(), 3) * 1.8;
+    s.set(sc, sc * (0.7 + rand() * 0.5), sc);
     m4.compose(v, q, s);
     belt.setMatrixAt(i, m4);
   }

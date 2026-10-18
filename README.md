@@ -30,4 +30,4 @@ Jangan commit file `.env`. Jangan pernah memakai `service_role` key di frontend.
 
 ## Database
 
-Migrasi ada di `supabase/migrations/` (urut 0001–0006). Edge Function `proxy` ada di `supabase/functions/proxy`.
+Seluruh skema database ada di satu file: `supabase/migrations/0001_full_schema.sql` (jalankan di database Supabase yang masih kosong). Edge Function `proxy` ada di `supabase/functions/proxy`.
