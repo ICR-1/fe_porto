@@ -15,19 +15,6 @@
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* ---------- Scroll progress ---------- */
-#scroll-progress {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%;
-  height: 3px;
-  z-index: 400;
-  transform-origin: 0 50%;
-  transform: scaleX(var(--p, 0));
-  background: var(--accent);
-  pointer-events: none;
-}
-
 /* ---------- Navbar ---------- */
 body #main-navbar {
   box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.6);
@@ -728,8 +715,6 @@ body .pc-wrap .pc-dots li.slick-active button { width: 28px; background: var(--a
 .foot-contact span { min-width: 0; overflow-wrap: break-word; }
 .foot-col > a.foot-contact:hover { transform: none; }
 .foot-bottom { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.6rem 1.5rem; padding-top: 1.6rem; font-size: 0.85rem; color: #94a3b8; }
-.foot-up { color: #cbd5e1; text-decoration: none; transition: color 0.2s, transform 0.3s var(--ease-out); }
-.foot-up:hover { color: #fff; transform: translateY(-2px); }
 
 @media (max-width: 960px) {
   .foot-grid { grid-template-columns: 1fr 1fr; }

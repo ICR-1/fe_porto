@@ -4,23 +4,6 @@ const finePointer = () => window.matchMedia('(hover: hover) and (pointer: fine)'
 
 const REVEAL = '.certificate-card, .foot-grid, .foot-bottom, .stat-card, .section-eyebrow';
 
-// Bilah progres scroll di paling atas
-const initScrollProgress = () => {
-  const bar = document.getElementById('scroll-progress');
-  if (!bar) return;
-  let ticking = false;
-  const update = () => {
-    const max = document.documentElement.scrollHeight - window.innerHeight;
-    bar.style.setProperty('--p', max > 0 ? Math.min(1, window.scrollY / max) : 0);
-    ticking = false;
-  };
-  window.addEventListener('scroll', () => {
-    if (!ticking) { ticking = true; requestAnimationFrame(update); }
-  }, { passive: true });
-  window.addEventListener('resize', update);
-  update();
-};
-
 // Tombol "magnet": sedikit tertarik ke kursor
 const initMagnetic = () => {
   if (!finePointer() || reduceMotion()) return;
@@ -71,7 +54,6 @@ const initReveal = () => {
 };
 
 export const initEffects = () => {
-  initScrollProgress();
   initMagnetic();
   initReveal();
 };
