@@ -823,9 +823,7 @@ const initCVModal = () => {
 
   if (!cvModal || !closeModalButton || !cvModalContent) return;
 
-  // Daftar CV diambil dari tabel `cvs` (dikelola di admin), dimuat saat modal pertama dibuka
   const cvList = document.getElementById('cv-modal-list');
-  const CV_COLORS = ['bg-blue-600 hover:bg-blue-700', 'bg-indigo-600 hover:bg-indigo-700'];
   const CV_ICON = 'M12 10v6m0 0l-3-3m3 3l3-3M3 17V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z';
   let cvLoaded = false;
   const cvMessage = (text) => {
@@ -841,15 +839,14 @@ const initCVModal = () => {
       if (error) throw error;
       const rows = (data || []).filter((c) => /^https?:\/\//i.test(c.url));
       if (!rows.length) { cvMessage('Belum ada CV yang tersedia.'); cvLoaded = true; return; }
-      cvList.replaceChildren(...rows.map((c, i) => {
+      cvList.replaceChildren(...rows.map((c) => {
         const a = document.createElement('a');
         a.href = c.url;
         a.target = '_blank';
         a.rel = 'noopener noreferrer';
-        a.className = `${CV_COLORS[i % CV_COLORS.length]} text-white py-4 px-6 rounded-lg transition-all duration-300 transform hover:scale-105 flex flex-col items-center justify-center text-center`;
-        a.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${CV_ICON}" /></svg>`;
+        a.className = 'cv-item-card';
+        a.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="${CV_ICON}" /></svg>`;
         const label = document.createElement('span');
-        label.className = 'font-medium';
         label.textContent = c.title;
         a.appendChild(label);
         return a;
@@ -1042,14 +1039,12 @@ const initNavbar = () => {
   const overlay = document.getElementById('sidebar-overlay');
   if (!navbar || !burger || !sidebar || !overlay) return;
 
-  // Scroll → .scrolled; sembunyi saat scroll ke bawah, muncul lagi saat scroll ke atas
-  let lastY = window.scrollY;
+  // Scroll → .scrolled; navbar tetap tampil saat scroll ke bawah maupun ke atas
   window.addEventListener('scroll', () => {
-    const y = window.scrollY;
-    navbar.classList.toggle('scrolled', y > 30);
-    if (y < 80 || y < lastY) navbar.classList.remove('nav-hidden');
-    else if (y > lastY + 4 && !sidebar.classList.contains('open')) navbar.classList.add('nav-hidden');
-    lastY = y;
+    navbar.classList.toggle('scrolled', window.scrollY > 30);
+    if (!document.documentElement.classList.contains('intro-lock')) {
+      navbar.classList.remove('nav-hidden');
+    }
   }, { passive: true });
 
   // Burger toggle

@@ -604,10 +604,23 @@ export const initSolarSystem = (container) => {
   const toolbar = document.createElement('div');
   toolbar.className = 'solar-toolbar';
   toolbar.innerHTML = `
-    <button type="button" data-act="play" aria-label="Jeda atau putar">Jeda</button>
-    <button type="button" data-act="speed" aria-label="Ubah kecepatan">1×</button>
-    <button type="button" data-act="orbits" aria-label="Tampilkan orbit" class="on">Orbit</button>
-    <button type="button" data-act="reset" aria-label="Reset tampilan">Reset</button>`;
+    <div class="solar-toolbar-group">
+      <button type="button" data-act="play" aria-label="Jeda atau putar">Jeda</button>
+      <button type="button" data-act="speed" aria-label="Ubah kecepatan">1×</button>
+      <button type="button" data-act="orbits" aria-label="Tampilkan orbit" class="on">Orbit</button>
+      <button type="button" data-act="reset" aria-label="Reset tampilan">Reset</button>
+    </div>
+    <a
+      href="https://space-mission-design-game-lf1sb946f-icr-1s-projects.vercel.app"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="solar-play-btn"
+      aria-label="Play Game Astra"
+    >
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.14v14l11-7-11-7z"/></svg>
+      <span>Play Game Astra</span>
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M8 7h9v9"/></svg>
+    </a>`;
   container.appendChild(toolbar);
 
   const panel = document.createElement('div');

@@ -156,10 +156,11 @@ const AboutSection = () => {
         
         <div className="flex flex-col sm:flex-row justify-center md:justify-start gap-4 mt-2">
           <button 
+            type="button"
             onClick={openCVModal}
-            className="bg-tertiary hover:bg-blue-600 text-white py-3 px-6 rounded-xl text-base font-medium transition-all duration-300 transform hover:scale-105 flex items-center justify-center border border-white/10"
+            className="about-cv-btn"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
             <span>Lihat CV Saya</span>

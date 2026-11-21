@@ -165,7 +165,7 @@ const PortfolioSection = () => {
     <div className="max-w-7xl mx-auto px-6 md:px-16">
       {/* ===== CERTIFICATES ===== */}
       <div className="mb-24">
-        <div className="mb-2">
+        <div className="mb-8">
           <span className="section-eyebrow">03 · Pencapaian</span>
           <h2 className="text-3xl md:text-4xl font-bold text-white">
             <span className="animated-underline active">
@@ -173,9 +173,6 @@ const PortfolioSection = () => {
             </span>
           </h2>
         </div>
-        <p style={{ color: '#aaa6c3', marginBottom: '2rem', fontSize: '0.95rem' }}>
-          Klik kartu untuk melihat detail sertifikat.
-        </p>
 
         <div className="certificate-grid">
           {loading
@@ -188,8 +185,11 @@ const PortfolioSection = () => {
                 data-caption={cert.title}
                 className="certificate-card"
               >
-                <img src={`${assetUrl(cert.image_path)}`} alt={cert.title} loading="lazy" />
-                <h3 style={{ color: '#e2e8f0', fontWeight: 600, fontSize: '0.95rem', textAlign: 'center', position: 'relative', zIndex: 1 }}>
+                <div className="cert-img-wrap">
+                  <img src={`${assetUrl(cert.image_path)}`} alt={cert.title} loading="lazy" />
+                  <span className="cert-view-pill">Lihat</span>
+                </div>
+                <h3 className="cert-title">
                   {cert.title}
                 </h3>
               </a>
@@ -199,8 +199,8 @@ const PortfolioSection = () => {
 
         {!loading && visibleCertCount < certificates.length && (
           <div className="load-more-container">
-            <button className="btn-load-more" onClick={() => setVisibleCertCount(v => v + 6)}>
-              Muat Lebih Banyak
+            <button type="button" className="btn-load-more" onClick={() => setVisibleCertCount(v => v + 6)}>
+              Muat Lebih Banyak ({certificates.length - visibleCertCount})
             </button>
           </div>
         )}
@@ -216,9 +216,6 @@ const PortfolioSection = () => {
             </span>
           </h2>
         </div>
-        <p style={{ color: '#aaa6c3', textAlign: 'center', marginBottom: '0', fontSize: '0.95rem' }}>
-          Klik gambar untuk memperbesar · geser atau pakai panah untuk melihat proyek lain
-        </p>
 
         <div
           className="project-slider-container pc-wrap"

@@ -157,37 +157,63 @@ body #hero-button:hover {
 }
 body h2 { letter-spacing: -0.02em; }
 
-/* ---------- Kartu: kaca gelap datar ---------- */
+/* ---------- Kartu: panel presisi dengan hairline & top highlight ---------- */
 body .about-card,
 body .certificate-card,
 body .proj-card-inner,
 body .contact-method-card,
-.stat-card,
-.skill-pill {
+.stat-card {
   position: relative;
   border: 1px solid var(--line);
-  background: var(--surface);
+  background: rgba(14, 15, 36, 0.76);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 24px 60px -28px rgba(0, 0, 0, 0.85);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
-  transition: transform 0.45s var(--ease-out), border-color 0.35s, box-shadow 0.45s, background 0.35s;
+  transition: transform 0.35s var(--ease-out), border-color 0.25s, box-shadow 0.35s, background 0.25s;
 }
 body .about-card {
   padding: 2.25rem;
-  border-radius: 28px;
-  box-shadow: 0 30px 80px -30px rgba(0, 0, 0, 0.7);
+  border-radius: 24px;
 }
-body .certificate-card::before,
+body .certificate-card::before { display: none; }
 body .proj-card-overlay { background: rgba(10, 9, 30, 0.72); }
 body .animated-underline::after { background: var(--accent); }
 body .portfolio-counter { background: var(--accent); }
 body .certificate-card:hover,
 body .proj-card-inner:hover,
 body .contact-method-card:hover {
-  background: var(--surface-hover);
+  background: rgba(20, 21, 50, 0.86);
   border-color: var(--line-hover);
-  box-shadow: 0 24px 60px -20px rgba(0, 0, 0, 0.8);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 28px 65px -24px rgba(0, 0, 0, 0.9);
 }
-body .contact-method-card:hover { transform: translateY(-8px); }
+body .contact-method-card:hover { transform: translateY(-6px); }
+
+/* Tombol CV di dalam About card */
+.about-cv-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  padding: 0.78rem 1.4rem;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #f1f5f9;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  cursor: pointer;
+  transition: transform 0.25s var(--ease-out), background 0.2s, border-color 0.2s, color 0.2s;
+}
+.about-cv-btn:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+  transform: translateY(-2px);
+}
 
 /* ---------- Foto profil ---------- */
 .avatar-ring {
@@ -209,34 +235,51 @@ body .contact-method-card:hover { transform: translateY(-8px); }
 .avatar-ring > div { position: relative; z-index: 1; border-color: #050816 !important; }
 @keyframes floaty { 50% { transform: translateY(-12px); } }
 
-/* ---------- Statistik ---------- */
+/* ---------- Statistik: bar metrik 3 kolom bersekat hairline ---------- */
 .stat-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 0.9rem;
-  margin-top: 2rem;
+  gap: 0;
+  margin-top: 1.85rem;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.02);
+  overflow: hidden;
 }
 .stat-card {
-  padding: 1.1rem 0.5rem;
-  border-radius: 18px;
+  padding: 1.05rem 0.65rem;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
   text-align: center;
+  transition: background 0.25s;
 }
-.stat-card:hover { transform: translateY(-4px); border-color: var(--line-hover); }
+.stat-card + .stat-card {
+  border-left: 1px solid var(--line) !important;
+}
+.stat-card:hover {
+  transform: none;
+  background: rgba(255, 255, 255, 0.035) !important;
+}
 .stat-num {
-  font-size: clamp(1.7rem, 4vw, 2.3rem);
+  font-size: clamp(1.65rem, 3.8vw, 2.2rem);
   font-weight: 800;
   line-height: 1;
+  font-variant-numeric: tabular-nums;
   color: #fff;
 }
 .stat-label {
   margin-top: 0.45rem;
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: #94a3b8;
 }
 
-/* ---------- Marquee skill (mask hanya untuk memudarkan tepi) ---------- */
+/* ---------- Marquee skill (kotak pill rapi tanpa compositor blur berat) ---------- */
 .marquee {
   position: relative;
   overflow: hidden;
@@ -247,32 +290,42 @@ body .contact-method-card:hover { transform: translateY(-8px); }
 .marquee + .marquee { margin-top: 0.9rem; }
 .marquee-track {
   display: flex;
-  gap: 0.9rem;
+  gap: 0.85rem;
   width: max-content;
   animation: marquee var(--dur, 45s) linear infinite;
 }
 .marquee.reverse .marquee-track { animation-direction: reverse; }
 .marquee:hover .marquee-track { animation-play-state: paused; }
-@keyframes marquee { to { transform: translateX(calc(-50% - 0.45rem)); } }
+@keyframes marquee { to { transform: translateX(calc(-50% - 0.425rem)); } }
 .skill-pill {
   display: flex;
   align-items: center;
-  gap: 0.85rem;
-  padding: 0.7rem 1.4rem 0.7rem 0.8rem;
-  border-radius: 999px;
+  gap: 0.75rem;
+  padding: 0.55rem 1.25rem 0.55rem 0.6rem;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: rgba(14, 15, 36, 0.88);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
   color: #e2e8f0;
   font-weight: 500;
   white-space: nowrap;
+  transition: transform 0.3s var(--ease-out), border-color 0.25s, background 0.25s;
 }
-.skill-pill:hover { transform: translateY(-4px); border-color: var(--line-hover); background: var(--surface-hover); box-shadow: 0 14px 34px -14px rgba(0, 0, 0, 0.8); }
+.skill-pill:hover {
+  transform: translateY(-3px);
+  border-color: var(--line-hover);
+  background: rgba(24, 25, 58, 0.95);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 14px 30px -16px rgba(0, 0, 0, 0.85);
+}
 .skill-pill .ico {
   display: grid;
   place-items: center;
-  width: 44px; height: 44px;
-  border-radius: 50%;
+  width: 38px; height: 38px;
+  border-radius: 10px;
   background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.14);
 }
-.skill-pill img { width: 26px; height: 26px; object-fit: contain; }
+.skill-pill img { width: 23px; height: 23px; object-fit: contain; }
 
 /* ---------- Reveal on scroll ---------- */
 .reveal {
@@ -287,8 +340,10 @@ body .contact-method-card:hover { transform: translateY(-8px); }
 /* ---------- Model 3D ---------- */
 body #model-container {
   border: 1px solid var(--line);
-  border-radius: 28px;
-  box-shadow: 0 40px 100px -40px rgba(0, 0, 0, 0.9);
+  border-radius: 22px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 36px 90px -36px rgba(0, 0, 0, 0.9);
 }
 body .interaction-helper {
   width: max-content;
@@ -354,38 +409,70 @@ body footer .social-link:hover {
 }
 .solar-toolbar {
   position: absolute;
-  left: 14px; bottom: 14px;
+  left: 14px; right: 14px; bottom: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  z-index: 5;
+  pointer-events: none;
+}
+.solar-toolbar-group {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  z-index: 5;
+  pointer-events: auto;
 }
 .solar-toolbar button {
-  padding: 6px 14px;
-  font-size: 0.75rem;
+  padding: 6px 13px;
+  font-size: 0.74rem;
   font-weight: 500;
   color: #cbd5e1;
-  background: rgba(5, 8, 22, 0.7);
+  background: rgba(10, 11, 28, 0.78);
   border: 1px solid var(--line);
-  border-radius: 999px;
+  border-radius: 10px;
   cursor: pointer;
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   transition: color 0.2s, background 0.2s, border-color 0.2s;
 }
-.solar-toolbar button:hover { color: #fff; border-color: rgba(255, 255, 255, 0.4); }
-.solar-toolbar button.on { color: #fff; border-color: var(--accent); }
+.solar-toolbar button:hover { color: #fff; border-color: rgba(255, 255, 255, 0.35); }
+.solar-toolbar button.on { color: #fff; background: rgba(99, 102, 241, 0.18); border-color: var(--accent); }
+.solar-play-btn {
+  pointer-events: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 13px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: #fff;
+  background: var(--accent);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 10px;
+  text-decoration: none;
+  box-shadow: 0 8px 24px -8px rgba(99, 102, 241, 0.75);
+  transition: transform 0.25s var(--ease-out), background 0.2s, box-shadow 0.25s;
+}
+.solar-play-btn:hover {
+  background: #7578f3;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px -8px rgba(99, 102, 241, 0.9);
+}
 .solar-panel {
   position: absolute;
   top: 14px; right: 14px;
   width: min(300px, calc(100% - 28px));
-  padding: 1rem 1.1rem 1.1rem;
-  background: rgba(5, 8, 22, 0.78);
-  border: 1px solid var(--line);
-  border-radius: 18px;
+  padding: 1rem 1.15rem 1.15rem;
+  background: rgba(11, 12, 32, 0.88);
+  border: 1px solid var(--line-hover);
+  border-radius: 16px;
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
-  box-shadow: 0 20px 50px -20px rgba(0, 0, 0, 0.9);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 20px 50px -20px rgba(0, 0, 0, 0.95);
   z-index: 5;
   text-align: left;
   opacity: 0;
@@ -394,10 +481,17 @@ body footer .social-link:hover {
   transition: opacity 0.3s, transform 0.3s;
 }
 .solar-panel.open { opacity: 1; transform: none; pointer-events: auto; }
-.solar-panel-title { margin: 0 0 0.6rem; font-size: 1.1rem; font-weight: 700; color: #fff; }
+.solar-panel-title {
+  margin: 0 0 0.7rem;
+  padding-bottom: 0.55rem;
+  border-bottom: 1px solid var(--line);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #fff;
+}
 .solar-panel-close {
   position: absolute;
-  top: 8px; right: 12px;
+  top: 9px; right: 12px;
   font-size: 1.3rem;
   line-height: 1;
   color: #94a3b8;
@@ -408,11 +502,12 @@ body footer .social-link:hover {
 .solar-panel-close:hover { color: #fff; }
 .solar-panel dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 0.35rem 0.9rem; font-size: 0.8rem; }
 .solar-panel dt { color: #94a3b8; }
-.solar-panel dd { margin: 0; color: #e2e8f0; text-align: right; font-weight: 500; }
+.solar-panel dd { margin: 0; color: #e2e8f0; text-align: right; font-weight: 500; font-variant-numeric: tabular-nums; }
 @media (max-width: 640px) {
   .solar-label { font-size: 0.62rem; padding: 1px 7px; }
-  .solar-toolbar button { padding: 5px 11px; font-size: 0.7rem; }
-  .solar-panel { top: auto; bottom: 54px; right: 10px; }
+  .solar-toolbar button,
+  .solar-play-btn { padding: 5px 11px; font-size: 0.7rem; }
+  .solar-panel { top: auto; bottom: 86px; right: 10px; }
 }
 #model-container .interaction-helper {
   top: 14px;
@@ -424,6 +519,91 @@ body footer .social-link:hover {
   max-width: calc(100% - 28px);
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* =========================================================
+   Kartu sertifikat & tombol muat lebih banyak
+   ========================================================= */
+body .certificate-card {
+  display: flex;
+  flex-direction: column;
+  padding: 0.9rem;
+  border-radius: 18px;
+  text-decoration: none;
+}
+body .certificate-card:hover {
+  transform: translateY(-4px);
+}
+.cert-img-wrap {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  width: 100%;
+  border-radius: 11px;
+  overflow: hidden;
+  background: #070816;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  margin-bottom: 0.85rem;
+}
+body .certificate-card .cert-img-wrap img {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  border-radius: 0;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.6s var(--ease-out);
+}
+body .certificate-card:hover .cert-img-wrap img {
+  transform: scale(1.04);
+}
+.cert-view-pill {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  padding: 4px 10px;
+  border-radius: 8px;
+  background: rgba(10, 11, 28, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.25s, transform 0.25s var(--ease-out);
+}
+body .certificate-card:hover .cert-view-pill {
+  opacity: 1;
+  transform: translateY(0);
+}
+.cert-title {
+  margin: 0;
+  padding: 0 0.2rem 0.15rem;
+  color: #e2e8f0;
+  font-weight: 600;
+  font-size: 0.94rem;
+  line-height: 1.45;
+  text-align: left;
+}
+body .btn-load-more {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.72rem 1.35rem;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #f1f5f9;
+  background: rgba(14, 15, 36, 0.85);
+  border: 1px solid var(--line-hover);
+  cursor: pointer;
+  transition: transform 0.25s var(--ease-out), background 0.2s, border-color 0.2s, color 0.2s;
+}
+body .btn-load-more:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+  transform: translateY(-2px);
 }
 
 /* =========================================================
@@ -442,39 +622,45 @@ body .project-slider-container.pc-wrap { position: relative; padding: 0 56px; ma
   height: 100%;
   overflow: hidden;
   border: 1px solid var(--line);
-  border-radius: 22px;
-  background: var(--surface);
+  border-radius: 20px;
+  background: rgba(14, 15, 36, 0.78);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 24px 60px -28px rgba(0, 0, 0, 0.85);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
-  transition: transform 0.5s var(--ease-out), border-color 0.35s, box-shadow 0.5s, background 0.35s;
+  transition: transform 0.4s var(--ease-out), border-color 0.3s, box-shadow 0.4s, background 0.3s;
 }
 .pcard:hover {
-  transform: translateY(-8px);
+  transform: translateY(-6px);
   border-color: var(--line-hover);
-  background: var(--surface-hover);
-  box-shadow: 0 30px 60px -24px rgba(0, 0, 0, 0.9);
+  background: rgba(20, 21, 50, 0.88);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 30px 65px -24px rgba(0, 0, 0, 0.92);
 }
 .pcard-media {
   position: relative;
   display: block;
   aspect-ratio: 16 / 10;
   overflow: hidden;
-  background: #0a0b1c;
+  background: #070816;
+  border-bottom: 1px solid var(--line);
   cursor: zoom-in;
 }
 .pcard-media img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.9s var(--ease-out);
+  transition: transform 0.8s var(--ease-out);
 }
-.pcard:hover .pcard-media img { transform: scale(1.07); }
-.pcard-body { display: flex; flex-direction: column; flex: 1; padding: 1.2rem 1.3rem 1.4rem; }
-.pcard-title { margin: 0; font-size: 1.15rem; font-weight: 700; line-height: 1.3; color: #fff; }
+.pcard:hover .pcard-media img { transform: scale(1.05); }
+.pcard-body { display: flex; flex-direction: column; flex: 1; padding: 1.25rem 1.35rem 1.35rem; }
+.pcard-title { margin: 0; font-size: 1.12rem; font-weight: 700; line-height: 1.3; color: #fff; }
 .pcard-desc {
   margin: 0.55rem 0 0;
   font-size: 0.88rem;
-  line-height: 1.6;
+  line-height: 1.62;
   color: #aaa6c3;
   display: -webkit-box;
   -webkit-line-clamp: 3;
@@ -483,13 +669,13 @@ body .project-slider-container.pc-wrap { position: relative; padding: 0 56px; ma
 }
 .pcard-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: auto; padding-top: 1rem; }
 .pcard-tag {
-  padding: 3px 11px;
+  padding: 3px 10px;
   font-size: 0.7rem;
   font-weight: 500;
-  color: var(--accent-soft);
-  background: rgba(99, 102, 241, 0.12);
-  border: 1px solid rgba(99, 102, 241, 0.28);
-  border-radius: 999px;
+  color: #cbd5e1;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 7px;
 }
 
 /* Panah */
@@ -499,18 +685,18 @@ body .project-slider-container.pc-wrap { position: relative; padding: 0 56px; ma
   z-index: 20;
   display: grid;
   place-items: center;
-  width: 52px;
-  height: 52px;
+  width: 48px;
+  height: 48px;
   padding: 0;
   color: #fff;
-  background: rgba(10, 11, 30, 0.82);
+  background: rgba(14, 15, 36, 0.88);
   border: 1px solid rgba(255, 255, 255, 0.16);
-  border-radius: 50%;
+  border-radius: 14px;
   cursor: pointer;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   box-shadow: 0 14px 34px -10px rgba(0, 0, 0, 0.9);
-  transition: transform 0.4s var(--ease-out), background 0.25s, border-color 0.25s, box-shadow 0.4s;
+  transition: transform 0.35s var(--ease-out), background 0.25s, border-color 0.25s;
 }
 .pc-arrow::after { display: none; }
 .pc-arrow-prev { left: -66px; }
@@ -571,12 +757,14 @@ body .pc-wrap .pc-dots li.slick-active button { width: 28px; background: var(--a
   align-items: center;
   gap: 2.4rem;
   padding: 2.2rem 2.4rem;
-  background: var(--surface);
+  background: rgba(14, 15, 36, 0.78);
   border: 1px solid var(--line);
-  border-radius: 28px;
+  border-radius: 24px;
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  box-shadow: 0 34px 80px -34px rgba(0, 0, 0, 0.9);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 34px 80px -34px rgba(0, 0, 0, 0.9);
 }
 .cc-title { margin: 0 0 1rem; font-size: 0.78rem; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase; color: #94a3b8; }
 .cc-title label { cursor: pointer; }
@@ -589,13 +777,13 @@ body .pc-wrap .pc-dots li.slick-active button { width: 28px; background: var(--a
   place-items: center;
   width: 56px; height: 56px;
   color: #e2e8f0;
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.035);
   border: 1px solid var(--line);
-  border-radius: 16px;
-  transition: transform 0.4s var(--ease-out), background 0.25s, color 0.25s, border-color 0.25s, box-shadow 0.4s;
+  border-radius: 14px;
+  transition: transform 0.3s var(--ease-out), background 0.2s, color 0.2s, border-color 0.2s;
 }
-.cc-icon svg { width: 24px; height: 24px; }
-.cc-icon:hover { background: var(--accent); border-color: transparent; color: #fff; transform: translateY(-6px) rotate(-4deg); box-shadow: 0 16px 30px -10px rgba(99, 102, 241, 0.85); }
+.cc-icon svg { width: 23px; height: 23px; }
+.cc-icon:hover { background: var(--accent); border-color: var(--accent); color: #fff; transform: translateY(-4px); }
 .cc-icon:focus-visible { outline: 2px solid var(--accent-soft); outline-offset: 3px; }
 .cc-icon::after {
   content: attr(data-label);
@@ -733,3 +921,70 @@ body .pc-wrap .pc-dots li.slick-active button { width: 28px; background: var(--a
 .pcard-link-text b { font-size: 0.85rem; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .pcard-link-text small { font-size: 0.72rem; color: #94a3b8; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .pcard-link svg { flex: none; color: #94a3b8; }
+
+/* ---------- Modal kotak CV & Terima kasih ---------- */
+.cv-modal-panel {
+  width: 100%;
+  max-width: 460px;
+  padding: 1.75rem;
+  border-radius: 22px;
+  background: rgba(14, 15, 36, 0.96);
+  border: 1px solid var(--line-hover);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 32px 80px -24px rgba(0, 0, 0, 0.95);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+.cv-modal-close {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--line);
+  color: #cbd5e1;
+  cursor: pointer;
+  transition: color 0.2s, background 0.2s, border-color 0.2s;
+}
+.cv-modal-close:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--line-hover);
+}
+.cv-item-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  padding: 1.35rem 1rem;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid var(--line);
+  color: #f1f5f9;
+  text-decoration: none;
+  text-align: center;
+  transition: transform 0.25s var(--ease-out), border-color 0.2s, background 0.2s;
+}
+.cv-item-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--accent);
+  background: rgba(99, 102, 241, 0.14);
+}
+.cv-item-card svg {
+  color: var(--accent-soft);
+}
+.cv-item-card span {
+  font-weight: 600;
+  font-size: 0.92rem;
+}
+
+/* Fancybox: sembunyikan panah navigasi pada layar mobile / sentuh agar user cukup swipe */
+@media (max-width: 768px), (hover: none) and (pointer: coarse) {
+  .fancybox__container .f-button.is-arrow,
+  .fancybox__carousel > .f-button.is-arrow {
+    display: none !important;
+  }
+}

@@ -87,26 +87,26 @@ const Login = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-primary px-6">
-      <div className="max-w-md w-full bg-tertiary p-10 rounded-2xl shadow-card backdrop-blur-md border border-white/10">
+      <div className="max-w-md w-full bg-[#0e0f24]/90 p-8 sm:p-10 rounded-[22px] shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_32px_80px_-24px_rgba(0,0,0,0.9)] backdrop-blur-md border border-white/10">
         <div className="text-center mb-8">
           <h2 className="text-3xl font-bold text-white-100">Admin Login</h2>
-          <p className="text-secondary mt-2">Masuk untuk mengelola konten</p>
+          <p className="text-secondary mt-2 text-sm">Masuk untuk mengelola konten</p>
         </div>
 
         {error && (
-          <div className="bg-red-500/10 border border-red-500/50 text-red-500 p-3 rounded-lg mb-6 text-sm text-center">
+          <div className="bg-red-500/10 border border-red-500/40 text-red-400 p-3 rounded-xl mb-6 text-sm text-center">
             {error}
           </div>
         )}
 
-        <form onSubmit={handleLogin} className="space-y-6">
+        <form onSubmit={handleLogin} className="space-y-5">
           <div>
             <label className="block text-secondary mb-2 text-sm">Email</label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full bg-black-200 text-white-100 px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all border border-white/5"
+              className="w-full bg-white/[0.04] text-white-100 px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-400 transition-all border border-white/10"
               placeholder="Masukkan email"
               required
             />
@@ -117,7 +117,7 @@ const Login = () => {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full bg-black-200 text-white-100 px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all border border-white/5"
+              className="w-full bg-white/[0.04] text-white-100 px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-400 transition-all border border-white/10"
               placeholder="••••••••"
               required
             />
@@ -130,14 +130,14 @@ const Login = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-xl transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50"
+            className="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-3 px-4 rounded-xl transition-colors disabled:opacity-50"
           >
             {loading ? 'Logging in...' : 'Sign In'}
           </button>
         </form>
         
         <div className="mt-8 text-center">
-          <button onClick={() => navigate('/')} className="text-secondary hover:text-white-100 text-sm transition-all">
+          <button onClick={() => navigate('/')} className="text-secondary hover:text-white-100 text-sm transition-colors">
             ← Kembali ke Website
           </button>
         </div>

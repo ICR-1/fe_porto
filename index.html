@@ -934,20 +934,19 @@
 
   <!-- CV Options Modal (hidden by default) - Moved outside of the About section -->
   <div id="cv-modal"
-    class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-80 hidden overflow-y-auto">
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-80 hidden overflow-y-auto px-4">
     <div
-      class="bg-tertiary p-6 rounded-xl max-w-md w-full mx-4 my-8 transform transition-all duration-300 scale-95 opacity-0 max-h-[90vh] overflow-y-auto"
+      class="cv-modal-panel my-8 transform transition-all duration-300 scale-95 opacity-0 max-h-[90vh] overflow-y-auto"
       id="cv-modal-content">
-      <div class="flex justify-between items-center mb-4">
+      <div class="flex justify-between items-center mb-5">
         <h3 class="text-2xl font-bold text-white-100 lang-text" data-lang-id="choose-cv">Pilih CV</h3>
-        <button id="close-cv-modal"
-          class="text-white hover:text-gray-300 transition-colors p-2 bg-black-200 hover:bg-tertiary rounded-full">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <button id="close-cv-modal" type="button" class="cv-modal-close" aria-label="Tutup modal CV">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
       </div>
-      <div id="cv-modal-list" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+      <div id="cv-modal-list" class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-2">
         <p class="text-secondary text-sm col-span-full text-center py-4">Memuat…</p>
       </div>
     </div>
@@ -962,7 +961,7 @@
 
   <!-- 3D Model Section -->
   <section class="relative w-full min-h-screen flex items-center z-10 px-6 md:px-16 py-20">
-    <div class="max-w-7xl mx-auto text-center">
+    <div class="max-w-7xl w-full mx-auto text-center">
       <span class="section-eyebrow center">Interaktif</span>
       <h2 class="text-3xl sm:text-4xl font-bold text-white-100 mb-4 model-title opacity-0">
         <span class="animated-underline lang-text" data-lang-id="solar-system">Model Tata Surya 3D</span>
@@ -973,8 +972,7 @@
       </div>
       <div id="model-container" class="w-full rounded-xl overflow-hidden bg-black-200 opacity-0 mx-auto"></div>
       <p class="text-secondary mt-6 text-center model-description opacity-0 lang-text" data-lang-id="model-desc">
-        Seret untuk memutar, scroll untuk zoom, dan klik sebuah planet untuk melihat detailnya. Orbit dibuat elips,
-        lengkap dengan bulan Bumi, cincin Saturnus, dan sabuk asteroid.
+        Seret untuk memutar, scroll untuk zoom, dan klik sebuah planet untuk melihat detailnya.
       </p>
     </div>
   </section>
